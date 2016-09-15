@@ -1,2 +1,5 @@
 target
 Cargo.lock
+bin
+deps/*.tar.gz
+deps/x86_64-linux
