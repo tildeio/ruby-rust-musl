@@ -1,0 +1,40 @@
+require "bundler/setup"
+
+def run_cmd(cmd, env={})
+  puts "system(#{env.inspect} #{cmd})"
+  system("#{cmd} 2>&1")
+end
+
+ROOT = File.expand_path("..", __FILE__)
+TARGET_DIR = "#{ROOT}/target/x86_64-linux"
+RUBY_EXT = "#{TARGET_DIR}/librustextension_native.so"
+
+namespace :build do
+  C_SRC = Dir["#{ROOT}/ext/{*.c,extconf.rb}"]
+
+  file RUBY_EXT => C_SRC do
+    extconf = File.expand_path("../ext/extconf.rb", __FILE__)
+
+    # Make sure that the directory is present
+    mkdir_p TARGET_DIR
+    mkdir_p File.dirname(RUBY_EXT)
+
+    chdir TARGET_DIR do
+      Bundler.with_clean_env do
+        run_cmd("ruby #{extconf}") or abort "failed to configure ruby ext"
+        run_cmd "make" or abort "failed to build ruby ext"
+      end
+    end
+  end
+end
+
+desc "build the ruby extension"
+task :build => RUBY_EXT
+
+desc "clean build artifacts"
+task :clean do
+  rm_f "ext/install.log"
+  rm_rf TARGET_DIR
+end
+
+task :default => :build

@@ -1,0 +1,4 @@
+{
+  global: rustextension_*;
+  local: *;
+};

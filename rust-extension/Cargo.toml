@@ -1,0 +1,17 @@
+[package]
+name = "rust-extension"
+version = "0.1.0"
+authors = ["Peter Wagenet <peter.wagenet@gmail.com>"]
+
+[lib]
+name = "rustextension"
+doctest = false
+crate-type = ["staticlib"]
+
+[profile.release]
+debug = true
+opt-level = 0
+
+[dependencies]
+time = "0.1.25"
+libc = "0.2"
