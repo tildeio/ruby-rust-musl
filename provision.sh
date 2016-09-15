@@ -25,6 +25,7 @@ fi
 
 if ! cmd_exists rustup; then
   curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
+  export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
 rustup target add x86_64-unknown-linux-musl
