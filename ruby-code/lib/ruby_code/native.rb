@@ -22,6 +22,7 @@ module RubyCode
       # Attempt to link the .sb
       puts "Loading Rust Extension"
       load_librustextension(lib)
+      puts "Loaded extension"
 
       # If nothing was thrown, then the native extension is present
       @@has_native_ext = true

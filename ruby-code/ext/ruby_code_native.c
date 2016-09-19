@@ -1,7 +1,9 @@
 #include <dlfcn.h>
+#include <stdio.h>
 #include <ruby.h>
 #include <rustextension_dlopen.h>
 #include <ruby_code_native.h>
+
 
 #ifdef HAVE_RUBY_ENCODING_H
 #include <ruby/encoding.h>
@@ -21,6 +23,20 @@
 
 VALUE rb_mRubyCode;
 
+static char** ruby_code_argv;
+static char** ruby_code_envp;
+
+static void
+init (int argc, char **argv, char **envp)
+{
+  ruby_code_argv = argv;
+  ruby_code_envp = envp;
+}
+
+static void (*const init_array []) ()
+  __attribute__ ((section (".init_array"), aligned (sizeof (void *))))
+  = { init };
+
 static VALUE
 load_librustextension(VALUE klass, VALUE path) {
   int res;
@@ -29,7 +45,7 @@ load_librustextension(VALUE klass, VALUE path) {
   CHECK_TYPE(path, T_STRING);
 
   // Already loaded
-  if (rustextension_number != 0) {
+  if (rustextension_init != 0) {
     return Qnil;
   }
 
@@ -39,6 +55,8 @@ load_librustextension(VALUE klass, VALUE path) {
     rb_raise(rb_eRuntimeError, "dlerror; msg=%s", dlerror());
     return Qnil;
   }
+
+  rustextension_init(ruby_code_envp, ruby_code_argv[0]);
 
   return Qnil;
 }
